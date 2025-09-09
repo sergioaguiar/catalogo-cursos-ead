@@ -1,11 +1,106 @@
 {
   "courses": [
-    { "id": 1, "title": "Curso de Segurança Cibernética", "status": "ativo",   "created_at": "2025-09-01T10:00:00Z" },
-    { "id": 2, "title": "Curso de LGPD",                  "status": "ativo",   "created_at": "2025-09-03T10:00:00Z" },
-    { "id": 3, "title": "Ética no Serviço Público",       "status": "inativo", "created_at": "2025-08-20T10:00:00Z" }
+    {
+      "id": 3,
+      "title": "Ética no Serviço Público",
+      "status": "inativo",
+      "created_at": "2025-08-20T10:00:00Z"
+    },
+    {
+      "id": 4,
+      "title": "Curso de Typescript",
+      "status": "ativo",
+      "created_at": "2025-09-09T12:00:00Z"
+    },
+    {
+      "id": 5,
+      "title": "Curso de Typescript",
+      "status": "ativo",
+      "created_at": "2025-09-09T12:00:00Z"
+    },
+    {
+      "id": 6,
+      "title": "Curso de Seguran�a Cibern�tica",
+      "status": "ativo",
+      "created_at": "2025-09-01T10:00:00Z"
+    },
+    {
+      "id": 7,
+      "title": "Curso de LGPD",
+      "status": "ativo",
+      "created_at": "2025-09-03T10:00:00Z"
+    },
+    {
+      "id": 8,
+      "title": "�tica no Servi�o P�blico",
+      "status": "inativo",
+      "created_at": "2025-08-20T10:00:00Z"
+    },
+    {
+      "id": 9,
+      "title": "Curso de Seguran�a Cibern�tica",
+      "status": "ativo",
+      "created_at": "2025-09-01T10:00:00Z"
+    },
+    {
+      "id": 10,
+      "title": "Curso de LGPD",
+      "status": "ativo",
+      "created_at": "2025-09-03T10:00:00Z"
+    },
+    {
+      "id": 11,
+      "title": "�tica no Servi�o P�blico",
+      "status": "inativo",
+      "created_at": "2025-08-20T10:00:00Z"
+    },
+    {
+      "id": 12,
+      "title": "Curso de LGPD",
+      "status": "ativo",
+      "created_at": "2025-09-03T10:00:00Z"
+    },
+    {
+      "id": 13,
+      "title": "Ética no Serviço Público",
+      "status": "inativo",
+      "created_at": "2025-08-20T10:00:00Z"
+    },
+    {
+      "id": 14,
+      "title": "Curso de Node",
+      "status": "ativo",
+      "created_at": "2025-09-09T12:00:00Z"
+    }
   ],
   "offers": [
-    { "id": 1, "course_id": 1, "created_at": "2025-09-05T10:00:00Z", "period_start": "2025-09-05", "period_end": "2025-10-05" },
-    { "id": 2, "course_id": 2, "created_at": "2025-09-07T10:00:00Z", "period_start": "2025-09-07", "period_end": "2025-10-07" }
+    {
+      "id": 3,
+      "course_id": 4,
+      "created_at": "2025-09-10T10:00:00Z",
+      "period_start": "2025-09-15",
+      "period_end": "2025-10-15"
+    },
+    {
+      "id": 4,
+      "course_id": 4,
+      "created_at": "2025-09-10T10:00:00Z",
+      "period_start": "2025-09-15",
+      "period_end": "2025-10-15"
+    },
+    {
+      "id": 5,
+      "course_id": 6,
+      "created_at": "2025-09-05T10:00:00Z",
+      "period_start": "2025-09-05",
+      "period_end": "2025-10-05"
+    },
+    {
+      "id": 6,
+      "course_id": 7,
+      "created_at": "2025-09-07T10:00:00Z",
+      "period_start": "2025-09-07",
+      "period_end": "2025-10-07"
+    }
   ]
 }
