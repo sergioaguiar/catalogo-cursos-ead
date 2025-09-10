@@ -19,6 +19,12 @@ app.use(helmet());             // segurança nos headers
 app.use(morgan("dev"));        // logs de requisições
 app.use(express.json());
 
+// 🔑 força JSON sempre em UTF-8
+app.use((req, res, next) => {
+  res.setHeader("Content-Type", "application/json; charset=utf-8");
+  next();
+});
+
 // rotas
 app.use("/courses", coursesRoutes);
 app.use("/offers", offersRoutes);
@@ -27,6 +33,9 @@ app.use("/reports", reportsRoutes);
 app.get("/health", (_req, res) => {
   res.json({ status: "ok" });
 });
+
+app.get("/", (_req, res) => res.json({ message: "API do Catálogo EAD rodando 🚀" }));
+
 
 await initDb();
 console.log(`✅ API rodando em http://localhost:${PORT}`);
