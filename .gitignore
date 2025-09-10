@@ -1,5 +1,45 @@
-﻿node_modules
-dist
-.env
+# --- Node.js (raiz, server, client)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
 *.log
+logs/
+
+# --- Build outputs
+dist/
+build/
+.vite/
+coverage/
+.cache/
+.turbo/
+.eslintcache
+
+# --- Ambiente (.env) - mantenha um exemplo versionado
+.env
+.env.*
+!.env.example
+
+# --- SO/Editor
 .DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+
+# --- Tailwind (cache eventual)
+*.tailwindcss*.tmp
+
+# --- Vite/React específicos (redundante, mas explícito)
+client/dist/
+client/node_modules/
+
+# --- DB local do lowdb (não versionar dados locais)
+server/src/db/db.json
+
+# Mantém a pasta db no git mesmo sem o db.json
+!server/src/db/
+server/src/db/.gitkeep
