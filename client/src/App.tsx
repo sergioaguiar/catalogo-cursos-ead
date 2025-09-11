@@ -1,36 +1,20 @@
-﻿import { NavLink, Routes, Route } from "react-router-dom";
-import CoursesPage from "./pages/CoursesPage";
-import OffersPage from "./pages/OffersPage";
+﻿import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+
+// IMPORTS **COM EXTENSÃO** PARA FORÇAR O RESOLVER DO VITE
+import CoursesPage from "./pages/CoursesPage.tsx";
+import OffersPage from "./pages/OffersPage.tsx";
+import CourseForm from "./components/CourseForm.tsx";
 
 export default function App() {
   return (
-    <div className="min-h-screen bg-zinc-50 text-zinc-900">
-      <header className="border-b bg-white">
-        <nav className="mx-auto flex max-w-6xl gap-6 p-4">
-          <NavLink
-            to="/"
-            end
-            className={({ isActive }) =>
-              `font-medium ${isActive ? "text-zinc-900" : "text-zinc-500"}`
-            }
-          >
-            Cursos
-          </NavLink>
-          <NavLink
-            to="/offers"
-            className={({ isActive }) =>
-              `font-medium ${isActive ? "text-zinc-900" : "text-zinc-500"}`
-            }
-          >
-            Ofertas
-          </NavLink>
-        </nav>
-      </header>
-
+    <BrowserRouter>
       <Routes>
-        <Route path="/" element={<CoursesPage />} />
+        <Route path="/" element={<Navigate to="/courses" replace />} />
+        <Route path="/courses" element={<CoursesPage />} />
+        <Route path="/courses/new" element={<CourseForm />} />
+        <Route path="/courses/:id/edit" element={<CourseForm />} />
         <Route path="/offers" element={<OffersPage />} />
       </Routes>
-    </div>
+    </BrowserRouter>
   );
 }

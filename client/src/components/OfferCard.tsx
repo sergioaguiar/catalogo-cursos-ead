@@ -1,31 +1,27 @@
-// src/components/OfferCard.tsx
-import type { OfferFull } from "../types";
+// client/src/components/OfferCard.tsx
+import type { OfferFull } from "../lib/api";
+import { formatISOToBR } from "../lib/dates";
 
-function fmtDate(d: string) {
-  try {
-    return new Date(d).toLocaleString();
-  } catch {
-    return d;
-  }
-}
+type Props = {
+  offer: OfferFull;
+  onEdit?: (o: OfferFull) => void;
+  onDelete?: (id: number) => void;
+};
 
-type Props = { offer: OfferFull };
-
-export default function OfferCard({ offer }: Props) {
+export default function OfferCard({ offer, onEdit, onDelete }: Props) {
   return (
-    <article className="rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm hover:shadow-md transition">
-      <header className="mb-2 flex items-start justify-between gap-3">
-        <h3 className="text-lg font-semibold leading-tight">
-          {offer.course?.title ?? `Curso #${offer.course_id}`}
-        </h3>
-        <span className="text-xs rounded-full bg-zinc-100 px-2 py-1 text-zinc-700">
-          {offer.period_start} → {offer.period_end}
-        </span>
+    <article className="rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm">
+      <header className="mb-1 flex items-center justify-between">
+        <h3 className="text-lg font-semibold">{offer.course.title}</h3>
       </header>
-
       <p className="text-sm text-zinc-500">
-        Criada em <time dateTime={offer.created_at}>{fmtDate(offer.created_at)}</time>
+        {formatISOToBR(offer.period_start)} até {formatISOToBR(offer.period_end)}
       </p>
+
+      <footer className="mt-3 flex gap-2">
+        <button className="btn btn-sm" onClick={() => onEdit?.(offer)}>Editar</button>
+        <button className="btn btn-sm btn-danger" onClick={() => onDelete?.(offer.id)}>Remover</button>
+      </footer>
     </article>
   );
 }

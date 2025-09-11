@@ -1,106 +1,81 @@
 {
-    "courses":  [
-                    {
-                        "id":  3,
-                        "title":  "Ética no Serviço Público",
-                        "status":  "inativo",
-                        "created_at":  "2025-08-20T10:00:00Z"
-                    },
-                    {
-                        "id":  4,
-                        "title":  "Curso de Typescript",
-                        "status":  "ativo",
-                        "created_at":  "2025-09-09T12:00:00Z"
-                    },
-                    {
-                        "id":  5,
-                        "title":  "Curso de Typescript",
-                        "status":  "ativo",
-                        "created_at":  "2025-09-09T12:00:00Z"
-                    },
-                    {
-                        "id":  6,
-                        "title":  "Curso de Segurança Cibernética",
-                        "status":  "ativo",
-                        "created_at":  "2025-09-01T10:00:00Z"
-                    },
-                    {
-                        "id":  7,
-                        "title":  "Curso de LGPD",
-                        "status":  "ativo",
-                        "created_at":  "2025-09-03T10:00:00Z"
-                    },
-                    {
-                        "id":  8,
-                        "title":  "Ética no Serviço Público",
-                        "status":  "inativo",
-                        "created_at":  "2025-08-20T10:00:00Z"
-                    },
-                    {
-                        "id":  9,
-                        "title":  "Curso de Segurança Cibernética",
-                        "status":  "ativo",
-                        "created_at":  "2025-09-01T10:00:00Z"
-                    },
-                    {
-                        "id":  10,
-                        "title":  "Curso de LGPD",
-                        "status":  "ativo",
-                        "created_at":  "2025-09-03T10:00:00Z"
-                    },
-                    {
-                        "id":  11,
-                        "title":  "Ética no Serviço Público",
-                        "status":  "inativo",
-                        "created_at":  "2025-08-20T10:00:00Z"
-                    },
-                    {
-                        "id":  12,
-                        "title":  "Curso de LGPD",
-                        "status":  "ativo",
-                        "created_at":  "2025-09-03T10:00:00Z"
-                    },
-                    {
-                        "id":  13,
-                        "title":  "Ética no Serviço Público",
-                        "status":  "inativo",
-                        "created_at":  "2025-08-20T10:00:00Z"
-                    },
-                    {
-                        "id":  14,
-                        "title":  "Curso de Node",
-                        "status":  "ativo",
-                        "created_at":  "2025-09-09T12:00:00Z"
-                    }
-                ],
-    "offers":  [
-                   {
-                       "id":  3,
-                       "course_id":  4,
-                       "created_at":  "2025-09-10T10:00:00Z",
-                       "period_start":  "2025-09-15",
-                       "period_end":  "2025-10-15"
-                   },
-                   {
-                       "id":  4,
-                       "course_id":  4,
-                       "created_at":  "2025-09-10T10:00:00Z",
-                       "period_start":  "2025-09-15",
-                       "period_end":  "2025-10-15"
-                   },
-                   {
-                       "id":  5,
-                       "course_id":  6,
-                       "created_at":  "2025-09-05T10:00:00Z",
-                       "period_start":  "2025-09-05",
-                       "period_end":  "2025-10-05"
-                   },
-                   {
-                       "id":  6,
-                       "course_id":  7,
-                       "created_at":  "2025-09-07T10:00:00Z",
-                       "period_start":  "2025-09-07",
-                       "period_end":  "2025-10-07"
-                   }
-               ]
+  "courses": [
+    {
+      "id": 3,
+      "title": "Ética no Serviço Público",
+      "status": "inativo",
+      "created_at": "2025-08-20T10:00:00Z"
+    },
+    {
+      "id": 4,
+      "title": "Curso de Typescript",
+      "status": "ativo",
+      "created_at": "2025-09-09T12:00:00Z"
+    },
+    {
+      "id": 5,
+      "title": "Curso de Typescript",
+      "status": "ativo",
+      "created_at": "2025-09-09T12:00:00Z"
+    },
+    {
+      "id": 6,
+      "title": "Curso de Segurança Cibernética",
+      "status": "ativo",
+      "created_at": "2025-09-01T10:00:00Z"
+    },
+    {
+      "id": 8,
+      "title": "Ética no Serviço Público",
+      "status": "inativo",
+      "created_at": "2025-08-20T10:00:00Z"
+    },
+    {
+      "id": 11,
+      "title": "Ética no Serviço Público",
+      "status": "inativo",
+      "created_at": "2025-08-20T10:00:00Z"
+    },
+    {
+      "id": 13,
+      "title": "Ética no Serviço Público",
+      "status": "inativo",
+      "created_at": "2025-08-20T10:00:00Z"
+    },
+    {
+      "id": 14,
+      "title": "Teste1",
+      "status": "ativo",
+      "created_at": "2025-09-10T22:49:23.634Z"
+    },
+    {
+      "id": 15,
+      "title": "teste 2",
+      "status": "inativo",
+      "created_at": "2025-09-11T01:59:56.000Z"
+    }
+  ],
+  "offers": [
+    {
+      "id": 4,
+      "course_id": 4,
+      "created_at": "2025-09-10T10:00:00Z",
+      "period_start": "2025-09-15",
+      "period_end": "2025-10-15"
+    },
+    {
+      "id": 5,
+      "course_id": 6,
+      "created_at": "2025-09-05T10:00:00Z",
+      "period_start": "2025-09-05",
+      "period_end": "2025-10-05"
+    },
+    {
+      "id": 6,
+      "course_id": 14,
+      "created_at": "2025-09-11T01:59:08.000Z",
+      "period_start": "2025-05-30",
+      "period_end": "2025-06-30"
+    }
+  ]
 }

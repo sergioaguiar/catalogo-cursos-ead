@@ -1,45 +1,34 @@
-# --- Node.js (raiz, server, client)
+# dependências
 node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
-*.log
-logs/
+package-lock.json
 
-# --- Build outputs
+# build
 dist/
 build/
-.vite/
-coverage/
 .cache/
-.turbo/
-.eslintcache
+*.tsbuildinfo
 
-# --- Ambiente (.env) - mantenha um exemplo versionado
+# ambiente
 .env
-.env.*
-!.env.example
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
 
-# --- SO/Editor
+# IDE/editor
+.vscode/
+.idea/
+*.swp
+*.swo
 .DS_Store
 Thumbs.db
-*.swp
-.idea/
-.vscode/*
-!.vscode/settings.json
-!.vscode/extensions.json
 
-# --- Tailwind (cache eventual)
-*.tailwindcss*.tmp
+# sistema operacional
+*.log
 
-# --- Vite/React específicos (redundante, mas explícito)
-client/dist/
-client/node_modules/
-
-# --- DB local do lowdb (não versionar dados locais)
-server/src/db/db.json
-
-# Mantém a pasta db no git mesmo sem o db.json
-!server/src/db/
-server/src/db/.gitkeep
+# coverage/testes
+coverage/

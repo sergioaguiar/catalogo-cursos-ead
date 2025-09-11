@@ -1,1 +1,9 @@
 ﻿@import "tailwindcss";
+/* helpers visuais simples */
+.btn { @apply rounded-lg border border-zinc-300 bg-white px-3 py-1.5 text-sm hover:bg-zinc-50; }
+.btn-success { @apply bg-green-600 text-white border-green-600 hover:bg-green-700; }
+.btn-danger { @apply bg-red-600 text-white border-red-600 hover:bg-red-700; }
+.btn-sm { @apply px-2 py-1 text-xs; }
+
+.input { @apply w-full rounded-lg border border-zinc-300 px-3 py-2 outline-none focus:border-zinc-500;}
+
