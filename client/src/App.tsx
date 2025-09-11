@@ -4,6 +4,7 @@
 import CoursesPage from "./pages/CoursesPage.tsx";
 import OffersPage from "./pages/OffersPage.tsx";
 import CourseForm from "./components/CourseForm.tsx";
+import OfferForm from "./components/OfferForm.tsx"; // <-- novo import
 
 export default function App() {
   return (
@@ -14,6 +15,8 @@ export default function App() {
         <Route path="/courses/new" element={<CourseForm />} />
         <Route path="/courses/:id/edit" element={<CourseForm />} />
         <Route path="/offers" element={<OffersPage />} />
+        <Route path="/offers/new" element={<OfferForm initial={null} onSaved={() => {}} onCancel={() => {}} />} /> 
+        {/* Ajuste os props conforme sua lógica de navegação/salvamento */}
       </Routes>
     </BrowserRouter>
   );
