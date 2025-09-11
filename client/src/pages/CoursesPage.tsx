@@ -4,6 +4,8 @@ import { listCourses, deleteCourse, Course } from "../lib/api";
 import StatusBadge from "../components/StatusBadge";
 import { formatISOToBR } from "../lib/dates";
 
+const collator = new Intl.Collator("pt-BR", { sensitivity: "base" });
+
 export default function CoursesPage() {
   const [courses, setCourses] = useState<Course[]>([]);
   const [err, setErr] = useState<string | null>(null);
@@ -25,11 +27,13 @@ export default function CoursesPage() {
     if (!confirm("Tem certeza que deseja excluir este curso?")) return;
     try {
       await deleteCourse(id);
-      setCourses(courses.filter((c) => c.id !== id));
+      setCourses((prev) => prev.filter((c) => c.id !== id));
     } catch (e: any) {
       alert(e?.message ?? "Erro ao excluir curso");
     }
   }
+
+  const sorted = [...courses].sort((a, b) => collator.compare(a.title, b.title));
 
   return (
     <div className="mx-auto max-w-5xl p-6">
@@ -45,8 +49,9 @@ export default function CoursesPage() {
 
       {err && <p className="mb-4 rounded-md bg-red-50 p-3 text-red-700">{err}</p>}
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        {courses.map((c) => (
+      {/* 1 por linha sempre */}
+      <div className="grid grid-cols-1 gap-4">
+        {sorted.map((c) => (
           <article
             key={c.id}
             className="rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm"
