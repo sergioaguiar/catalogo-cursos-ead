@@ -13,46 +13,36 @@ export type Course = {
 export type Offer = {
   id: number;
   course_id: number;
-  period_start: string; // ISO
-  period_end: string;   // ISO
-  created_at: string;   // ISO
+  period_start: string; // ISO "YYYY-MM-DD"
+  period_end: string;   // ISO "YYYY-MM-DD"
+  created_at: string;   // ISO datetime
 };
 
 export type OfferFull = Offer & {
-  course?: Course;
-  [k: string]: any;
+  course: Course; // usado pelo seu OfferCard
 };
 
 /** =========================
  *  Config / Helpers
  *  ========================= */
-const BASE = (import.meta.env.VITE_API_URL ?? "").replace(/\/+$/, "");
-const normalize = (s: string) => String(s ?? "").trim().toLocaleLowerCase();
+const API_URL =
+  (import.meta.env.VITE_API_URL as string | undefined)?.replace(/\/+$/, "") ||
+  "http://localhost:3000";
 
 async function fetchJSON<T>(path: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(`${BASE}${path}`, {
+  const res = await fetch(`${API_URL}${path}`, {
     ...init,
     headers: { "Content-Type": "application/json", ...(init?.headers || {}) },
   });
-
   if (!res.ok) {
     const txt = await res.text().catch(() => "");
-    throw new Error(txt || `HTTP ${res.status}`);
+    throw new Error(`Erro ${res.status} em ${path}${txt ? `: ${txt}` : ""}`);
   }
-
-  const ct = res.headers.get("content-type") || "";
-  if (!ct.includes("application/json")) {
-    const txt = await res.text().catch(() => "");
-    throw new Error(
-      `Resposta não-JSON em ${path}. CT: ${ct}. Trecho: ${txt.slice(0, 160)}`
-    );
-  }
-
-  return res.json() as Promise<T>;
+  return res.json();
 }
 
 /** =========================
- *  Cursos  (rotas sem /api)
+ *  Courses
  *  ========================= */
 export function listCourses(): Promise<Course[]> {
   return fetchJSON<Course[]>("/courses");
@@ -62,34 +52,16 @@ export function getCourse(id: number): Promise<Course> {
   return fetchJSON<Course>(`/courses/${id}`);
 }
 
-/** BLOQUEIO de nomes duplicados (case-insensitive) */
-export async function createCourse(
-  data: Omit<Course, "id">
-): Promise<Course> {
-  const all = await listCourses();
-  const dup = all.some((c) => normalize(c.title) === normalize(data.title));
-  if (dup) throw new Error("Já existe um curso com esse nome.");
-
+export function createCourse(data: Omit<Course, "id">): Promise<Course> {
   return fetchJSON<Course>("/courses", {
     method: "POST",
     body: JSON.stringify(data),
   });
 }
 
-export async function updateCourse(
-  id: number,
-  data: Partial<Course>
-): Promise<Course> {
-  if (data.title) {
-    const all = await listCourses();
-    const dup = all.some(
-      (c) => c.id !== id && normalize(c.title) === normalize(data.title!)
-    );
-    if (dup) throw new Error("Já existe um curso com esse nome.");
-  }
-
+export function updateCourse(id: number, data: Partial<Omit<Course, "id">>): Promise<Course> {
   return fetchJSON<Course>(`/courses/${id}`, {
-    method: "PUT",
+    method: "PATCH",
     body: JSON.stringify(data),
   });
 }
@@ -99,10 +71,10 @@ export function deleteCourse(id: number): Promise<void> {
 }
 
 /** =========================
- *  Ofertas  (rotas sem /api)
+ *  Offers
  *  ========================= */
-export function listOffersFull(): Promise<OfferFull[]> {
-  return fetchJSON<OfferFull[]>("/offers/full");
+export function listOffers(): Promise<Offer[]> {
+  return fetchJSON<Offer[]>("/offers");
 }
 
 export function getOffer(id: number): Promise<Offer> {
@@ -116,10 +88,8 @@ export function createOffer(data: Omit<Offer, "id">): Promise<Offer> {
   });
 }
 
-export function updateOffer(
-  id: number,
-  data: Partial<Offer>
-): Promise<Offer> {
+// Mantive PUT porque seu arquivo atual usa PUT para updateOffer
+export function updateOffer(id: number, data: Partial<Offer>): Promise<Offer> {
   return fetchJSON<Offer>(`/offers/${id}`, {
     method: "PUT",
     body: JSON.stringify(data),
@@ -128,4 +98,18 @@ export function updateOffer(
 
 export function deleteOffer(id: number): Promise<void> {
   return fetchJSON<void>(`/offers/${id}`, { method: "DELETE" });
+}
+
+/** =========================
+ *  Offers "cheias" (OfferFull)
+ *  =========================
+ *  Gera o shape esperado pelo OfferCard: { ...offer, course }
+ */
+export async function listOffersFull(): Promise<OfferFull[]> {
+  const [offers, courses] = await Promise.all([listOffers(), listCourses()]);
+  const byId = new Map<number, Course>(courses.map(c => [c.id, c]));
+  return offers.map(o => ({
+    ...o,
+    course: byId.get(o.course_id) ?? { id: o.course_id, title: `Curso #${o.course_id}`, status: "ativo", created_at: new Date().toISOString() },
+  }));
 }
