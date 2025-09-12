@@ -32,3 +32,10 @@ Thumbs.db
 
 # coverage/testes
 coverage/
+
+# Ignorar db.json em qualquer pasta dentro de src
+server/src/**/db.json
+
+# (opcional) ignorar db.json em qualquer lugar, exceto o oficial
+# *db.json
+# !server/db.json
