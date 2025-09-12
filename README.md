@@ -27,9 +27,11 @@ API disponível em: [http://localhost:3000](http://localhost:3000)
 
 - UI em React com **TailwindCSS**.
 - Páginas principais:
-  - **Cursos**: listagem, criação, edição e exclusão.
-  - **Ofertas**: listagem, criação, edição e exclusão.
+  - **Cursos**: listagem, criação, edição, exclusão, busca por título/ID e filtro por status.
+  - **Ofertas**: listagem, criação, edição, exclusão e busca por título/ID.
 - Componentes reutilizáveis para cards, formulários e navegação.
+- Utilização de **hooks** e **React Router** para navegação entre páginas.
+- Integração com API REST para sincronizar dados em tempo real.
 
 ### Como rodar o frontend
 
@@ -58,6 +60,8 @@ App disponível em: [http://localhost:5173](http://localhost:5173)
 - [x] Seleção de curso existente ao criar oferta
 - [x] Validações de formulário (campos obrigatórios, datas)
 - [x] Datas exibidas no formato **DD/MM/AAAA**
+- [x] Busca por título ou ID em cursos e ofertas
+- [x] Filtro por status em cursos
 
 ---
 
