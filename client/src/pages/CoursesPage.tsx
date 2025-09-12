@@ -1,85 +1,150 @@
-import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { listCourses, deleteCourse, Course } from "../lib/api";
-import StatusBadge from "../components/StatusBadge";
-import { formatISOToBR } from "../lib/dates";
-
-const collator = new Intl.Collator("pt-BR", { sensitivity: "base" });
+// client/src/pages/CoursesPage.tsx
+import { useEffect, useMemo, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { listCourses, deleteCourse, type Course } from "../lib/api";
 
 export default function CoursesPage() {
+  const navigate = useNavigate();
+
   const [courses, setCourses] = useState<Course[]>([]);
-  const [err, setErr] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const [q, setQ] = useState("");
+  const [status, setStatus] = useState<"" | "ativo" | "inativo">("");
+
+  async function load() {
+    try {
+      setLoading(true);
+      const data = await listCourses();
+      setCourses(data);
+      setError(null);
+    } catch (e: any) {
+      setError(e?.message ?? "Erro ao carregar cursos");
+    } finally {
+      setLoading(false);
+    }
+  }
 
   useEffect(() => {
     load();
   }, []);
 
-  async function load() {
-    try {
-      const data = await listCourses();
-      setCourses(data);
-    } catch (e: any) {
-      setErr(e?.message ?? "Erro ao carregar cursos");
-    }
-  }
-
   async function handleDelete(id: number) {
-    if (!confirm("Tem certeza que deseja excluir este curso?")) return;
+    if (!confirm("Remover este curso?")) return;
     try {
       await deleteCourse(id);
-      setCourses((prev) => prev.filter((c) => c.id !== id));
+      setCourses(curr => curr.filter(c => c.id !== id));
     } catch (e: any) {
-      alert(e?.message ?? "Erro ao excluir curso");
+      alert(e?.message ?? "Erro ao remover curso");
     }
   }
 
-  const sorted = [...courses].sort((a, b) => collator.compare(a.title, b.title));
+  const filtered = useMemo(() => {
+    const term = q.trim().toLowerCase();
+    return courses.filter(c => {
+      const byText =
+        !term ||
+        String(c.id).includes(term) ||
+        (c.title?.toLowerCase().includes(term) ?? false);
+      const byStatus = !status || (c.status?.toLowerCase() === status);
+      return byText && byStatus;
+    });
+  }, [courses, q, status]);
 
   return (
-    <div className="mx-auto max-w-5xl p-6">
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">Cursos</h1>
-        <Link
-          to="/courses/new"
-          className="rounded-md bg-green-600 px-4 py-2 text-white hover:bg-green-700"
+    <section>
+      <header className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 className="text-2xl font-bold">Cursos</h1>
+          <p className="text-sm text-zinc-600">
+            Listagem carregada de <code>/courses</code>.
+          </p>
+        </div>
+        <Link to="/courses/new" className="btn btn-success">Novo curso</Link>
+      </header>
+
+      <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center">
+        <input
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          placeholder="Buscar por título ou ID…"
+          className="input sm:w-80"
+        />
+        <select
+          value={status}
+          onChange={(e) => setStatus(e.target.value as any)}
+          className="input sm:w-44"
+          title="Filtrar por status"
         >
-          Novo Curso
-        </Link>
+          <option value="">Todos os status</option>
+          <option value="ativo">Ativo</option>
+          <option value="inativo">Inativo</option>
+        </select>
       </div>
 
-      {err && <p className="mb-4 rounded-md bg-red-50 p-3 text-red-700">{err}</p>}
+      {loading && <p>Carregando…</p>}
+      {error && (
+        <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-red-700">
+          {error}
+        </div>
+      )}
 
-      {/* 1 por linha sempre */}
-      <div className="grid grid-cols-1 gap-4">
-        {sorted.map((c) => (
-          <article
-            key={c.id}
-            className="rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm"
-          >
-            <header className="mb-2 flex items-start justify-between gap-3">
-              <h3 className="text-lg font-semibold leading-tight">{c.title}</h3>
-              <StatusBadge status={c.status} />
-            </header>
-            <p className="text-sm text-zinc-500">
-              Criado em {formatISOToBR(c.created_at)}
-            </p>
-            <div className="mt-3 flex gap-2">
-              <Link
-                to={`/courses/${c.id}/edit`}
-                className="rounded-md border px-3 py-1 text-sm hover:bg-zinc-50"
-              >
-                Editar
-              </Link>
-              <button
-                onClick={() => handleDelete(c.id)}
-                className="rounded-md bg-red-600 px-3 py-1 text-sm text-white hover:bg-red-700"
-              >
-                Remover
-              </button>
+      {!loading && !error && (
+        <>
+          {filtered.length === 0 ? (
+            <p className="text-zinc-600">Nenhum curso encontrado.</p>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {filtered.map((c) => (
+                <article
+                  key={c.id}
+                  className="rounded-2xl border border-gray-200 p-4 shadow hover:shadow-md transition"
+                >
+                  <header className="flex items-start justify-between gap-3">
+                    <h3 className="text-lg font-semibold">
+                      {c.title || `Curso #${c.id}`}
+                    </h3>
+                    <span className="text-xs px-2 py-1 rounded-full bg-gray-100 border">
+                      #{c.id}
+                    </span>
+                  </header>
+
+                  <p className="text-sm text-gray-600 mt-1">
+                    Status:{" "}
+                    <strong className={c.status === "inativo" ? "text-red-700" : "text-emerald-700"}>
+                      {c.status ?? "—"}
+                    </strong>
+                  </p>
+
+                  {c.created_at && (
+                    <p className="text-xs text-gray-500 mt-2">
+                      Criado em {new Date(c.created_at).toLocaleString("pt-BR")}
+                    </p>
+                  )}
+
+                  <footer className="mt-4 flex items-center gap-2">
+                    <button
+                      className="btn"
+                      onClick={() => navigate("/courses/new", { state: { initial: c } })}
+                      title="Editar"
+                    >
+                      Editar
+                    </button>
+                    <button
+                      className="btn btn-danger"
+                      onClick={() => handleDelete(c.id)}
+                      title="Remover"
+                    >
+                      Remover
+                    </button>
+                  </footer>
+                </article>
+              ))}
             </div>
-          </article>
-        ))}
-      </div>
-    </div>
+          )}
+        </>
+      )}
+    </section>
   );
 }
