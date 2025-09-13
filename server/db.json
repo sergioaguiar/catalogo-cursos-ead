@@ -1,0 +1,266 @@
+{
+  "courses": [
+    {
+      "id": 1,
+      "title": "Ética no Serviço Público",
+      "status": "inativo",
+      "created_at": "2025-06-15T15:51:24.000Z"
+    },
+    {
+      "id": 2,
+      "title": "Análise de Dados",
+      "status": "ativo",
+      "created_at": "2025-06-15T15:51:24.000Z"
+    },
+    {
+      "id": 3,
+      "title": "Arquitetura de Software",
+      "status": "ativo",
+      "created_at": "2025-07-15T15:51:24.000Z"
+    },
+    {
+      "id": 4,
+      "title": "Curso de LGPD",
+      "status": "ativo",
+      "created_at": "2025-08-24T15:51:24.000Z"
+    },
+    {
+      "id": 5,
+      "title": "Introdução a Redes de Computadores",
+      "status": "ativo",
+      "created_at": "2025-05-10T15:51:24.000Z"
+    },
+    {
+      "id": 6,
+      "title": "Desenvolvimento Web com React",
+      "status": "ativo",
+      "created_at": "2025-08-10T15:51:24.000Z"
+    },
+    {
+      "id": 7,
+      "title": "Banco de Dados Relacionais",
+      "status": "inativo",
+      "created_at": "2025-04-10T15:51:24.000Z"
+    },
+    {
+      "id": 8,
+      "title": "Gestão de Projetos Ágeis",
+      "status": "ativo",
+      "created_at": "2025-07-01T15:51:24.000Z"
+    },
+    {
+      "id": 9,
+      "title": "Segurança da Informação",
+      "status": "ativo",
+      "created_at": "2025-09-01T15:51:24.000Z"
+    },
+    {
+      "id": 10,
+      "title": "Usabilidade e Experiência do Usuário",
+      "status": "ativo",
+      "created_at": "2025-05-30T15:51:24.000Z"
+    },
+    {
+      "id": 11,
+      "title": "Programação em TypeScript",
+      "status": "ativo",
+      "created_at": "2025-08-05T15:51:24.000Z"
+    },
+    {
+      "id": 12,
+      "title": "Noções de Estatística Aplicada",
+      "status": "inativo",
+      "created_at": "2025-04-25T15:51:24.000Z"
+    },
+    {
+      "id": 13,
+      "title": "Testes Automatizados",
+      "status": "ativo",
+      "created_at": "2025-08-12T15:51:24.000Z"
+    },
+    {
+      "id": 14,
+      "title": "Integração Contínua e DevOps",
+      "status": "ativo",
+      "created_at": "2025-06-30T15:51:24.000Z"
+    },
+    {
+      "id": 15,
+      "title": "Lógica de Programação",
+      "status": "ativo",
+      "created_at": "2025-03-20T15:51:24.000Z"
+    },
+    {
+      "id": 16,
+      "title": "Direito Administrativo Aplicado",
+      "status": "inativo",
+      "created_at": "2025-02-18T15:51:24.000Z"
+    },
+    {
+      "id": 17,
+      "title": "Redação Oficial",
+      "status": "ativo",
+      "created_at": "2025-05-22T15:51:24.000Z"
+    },
+    {
+      "id": 18,
+      "title": "Administração Pública Contemporânea",
+      "status": "ativo",
+      "created_at": "2025-06-20T15:51:24.000Z"
+    },
+    {
+      "id": 19,
+      "title": "Processos de Licitação e Contratos",
+      "status": "ativo",
+      "created_at": "2025-07-30T15:51:24.000Z"
+    },
+    {
+      "id": 20,
+      "title": "Atendimento ao Cidadão",
+      "status": "ativo",
+      "created_at": "2025-08-20T15:51:24.000Z"
+    }
+  ],
+  "offers": [
+    {
+      "id": 1,
+      "course_id": 5,
+      "period_start": "2025-09-10",
+      "period_end": "2025-10-10",
+      "created_at": "2025-09-09T12:00:00.000Z"
+    },
+    {
+      "id": 2,
+      "course_id": 2,
+      "period_start": "2025-08-25",
+      "period_end": "2025-09-24",
+      "created_at": "2025-08-24T12:00:00.000Z"
+    },
+    {
+      "id": 3,
+      "course_id": 3,
+      "period_start": "2025-09-18",
+      "period_end": "2025-10-18",
+      "created_at": "2025-09-12T12:00:00.000Z"
+    },
+    {
+      "id": 4,
+      "course_id": 4,
+      "period_start": "2025-09-14",
+      "period_end": "2025-10-14",
+      "created_at": "2025-09-13T12:00:00.000Z"
+    },
+    {
+      "id": 5,
+      "course_id": 6,
+      "period_start": "2025-08-30",
+      "period_end": "2025-09-29",
+      "created_at": "2025-08-29T12:00:00.000Z"
+    },
+    {
+      "id": 6,
+      "course_id": 7,
+      "period_start": "2025-09-25",
+      "period_end": "2025-10-25",
+      "created_at": "2025-09-10T12:00:00.000Z"
+    },
+    {
+      "id": 7,
+      "course_id": 8,
+      "period_start": "2025-09-07",
+      "period_end": "2025-10-07",
+      "created_at": "2025-09-06T12:00:00.000Z"
+    },
+    {
+      "id": 8,
+      "course_id": 9,
+      "period_start": "2025-09-26",
+      "period_end": "2025-10-26",
+      "created_at": "2025-09-15T12:00:00.000Z"
+    },
+    {
+      "id": 9,
+      "course_id": 10,
+      "period_start": "2025-08-20",
+      "period_end": "2025-09-20",
+      "created_at": "2025-08-19T12:00:00.000Z"
+    },
+    {
+      "id": 10,
+      "course_id": 11,
+      "period_start": "2025-09-16",
+      "period_end": "2025-10-16",
+      "created_at": "2025-09-14T12:00:00.000Z"
+    },
+    {
+      "id": 11,
+      "course_id": 12,
+      "period_start": "2025-09-21",
+      "period_end": "2025-10-21",
+      "created_at": "2025-09-20T12:00:00.000Z"
+    },
+    {
+      "id": 12,
+      "course_id": 13,
+      "period_start": "2025-09-05",
+      "period_end": "2025-10-05",
+      "created_at": "2025-09-04T12:00:00.000Z"
+    },
+    {
+      "id": 13,
+      "course_id": 14,
+      "period_start": "2025-09-19",
+      "period_end": "2025-10-19",
+      "created_at": "2025-09-15T12:00:00.000Z"
+    },
+    {
+      "id": 14,
+      "course_id": 15,
+      "period_start": "2025-08-15",
+      "period_end": "2025-09-14",
+      "created_at": "2025-08-14T12:00:00.000Z"
+    },
+    {
+      "id": 15,
+      "course_id": 16,
+      "period_start": "2025-09-15",
+      "period_end": "2025-10-15",
+      "created_at": "2025-09-13T12:00:00.000Z"
+    },
+    {
+      "id": 16,
+      "course_id": 17,
+      "period_start": "2025-08-31",
+      "period_end": "2025-09-30",
+      "created_at": "2025-08-30T12:00:00.000Z"
+    },
+    {
+      "id": 17,
+      "course_id": 18,
+      "period_start": "2025-09-22",
+      "period_end": "2025-10-22",
+      "created_at": "2025-09-21T12:00:00.000Z"
+    },
+    {
+      "id": 18,
+      "course_id": 19,
+      "period_start": "2025-09-08",
+      "period_end": "2025-10-08",
+      "created_at": "2025-09-07T12:00:00.000Z"
+    },
+    {
+      "id": 19,
+      "course_id": 20,
+      "period_start": "2025-09-17",
+      "period_end": "2025-10-17",
+      "created_at": "2025-09-15T12:00:00.000Z"
+    },
+    {
+      "id": 20,
+      "course_id": 1,
+      "period_start": "2025-09-23",
+      "period_end": "2025-10-23",
+      "created_at": "2025-09-13T12:00:00.000Z"
+    }
+  ]
+}

@@ -41,11 +41,11 @@ coverage/
 # Ignorar db.json em qualquer pasta dentro de src
 server/src/**/db.json
 
-# Ignorar db.json oficial (não versionar dados locais)
-server/db.json
-
-# Exemplo vazio de referência (vai pro repo)
+# Banco que vai pro repo
+!server/db.json
 !server/db.example.json
 
 # Seeds temporários não usados
 seed.js
+seed.ts
+server/seed.ps1

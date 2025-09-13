@@ -66,16 +66,18 @@ export default function App() {
       </Container>
 
       {/* Rodapé */}
-      <footer className="mt-10 border-t pt-4 pb-6 text-center text-sm text-gray-500">
-        Fonte do logo:{" "}
-        <a
-          href="https://br.freepik.com/vetores-gratis/ilustracao-do-conceito-abstrato-da-plataforma-da-escola-online-ensino-domestico-plataforma-de-educacao-online-aulas-digitais-cursos-virtuais-lms-para-a-escola_12145615.htm#fromView=keyword&page=1&position=0&uuid=ba1cc70d-f72c-4055-83e5-87318c33e749&query=Educacao+svg"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="underline hover:text-gray-700"
-        >
-          Freepik
-        </a>
+      <footer className="mt-12 border-t bg-gradient-to-b from-slate-800 to-slate-900">
+        <div className="mx-auto max-w-6xl px-4 py-6 text-center text-sm text-slate-300">
+          Fonte do logo:{" "}
+          <a
+            href="https://br.freepik.com/vetores-gratis/ilustracao-do-conceito-abstrato-da-plataforma-da-escola-online-ensino-domestico-plataforma-de-educacao-online-aulas-digitais-cursos-virtuais-lms-para-a-escola_12145615.htm#fromView=keyword&page=1&position=0&uuid=ba1cc70d-f72c-4055-83e5-87318c33e749&query=Educacao+svg"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline hover:text-white"
+          >
+            Freepik
+          </a>
+        </div>
       </footer>
     </BrowserRouter>
   );
