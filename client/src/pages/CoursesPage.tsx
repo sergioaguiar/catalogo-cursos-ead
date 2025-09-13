@@ -34,7 +34,7 @@ export default function CoursesPage() {
     if (!confirm("Remover este curso?")) return;
     try {
       await deleteCourse(id);
-      setCourses(curr => curr.filter(c => c.id !== id));
+      setCourses((curr) => curr.filter((c) => c.id !== id));
     } catch (e: any) {
       alert(e?.message ?? "Erro ao remover curso");
     }
@@ -42,12 +42,12 @@ export default function CoursesPage() {
 
   const filtered = useMemo(() => {
     const term = q.trim().toLowerCase();
-    return courses.filter(c => {
+    return courses.filter((c) => {
       const byText =
         !term ||
         String(c.id).includes(term) ||
         (c.title?.toLowerCase().includes(term) ?? false);
-      const byStatus = !status || (c.status?.toLowerCase() === status);
+      const byStatus = !status || c.status?.toLowerCase() === status;
       return byText && byStatus;
     });
   }, [courses, q, status]);
@@ -61,7 +61,9 @@ export default function CoursesPage() {
             Listagem carregada de <code>/courses</code>.
           </p>
         </div>
-        <Link to="/courses/new" className="btn btn-success">Novo curso</Link>
+        <Link to="/courses/new" className="btn btn-success">
+          Novo curso
+        </Link>
       </header>
 
       <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center">
@@ -112,7 +114,13 @@ export default function CoursesPage() {
 
                   <p className="text-sm text-gray-600 mt-1">
                     Status:{" "}
-                    <strong className={c.status === "inativo" ? "text-red-700" : "text-emerald-700"}>
+                    <strong
+                      className={
+                        c.status === "inativo"
+                          ? "text-red-700"
+                          : "text-emerald-700"
+                      }
+                    >
                       {c.status ?? "—"}
                     </strong>
                   </p>
@@ -126,7 +134,7 @@ export default function CoursesPage() {
                   <footer className="mt-4 flex items-center gap-2">
                     <button
                       className="btn"
-                      onClick={() => navigate("/courses/new", { state: { initial: c } })}
+                      onClick={() => navigate(`/courses/${c.id}/edit`)}
                       title="Editar"
                     >
                       Editar

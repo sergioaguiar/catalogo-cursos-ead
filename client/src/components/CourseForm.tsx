@@ -1,3 +1,4 @@
+// client/src/components/CourseForm.tsx
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Course, createCourse, getCourse, updateCourse } from "../lib/api";
@@ -20,7 +21,7 @@ export default function CourseForm() {
       try {
         const c = await getCourse(Number(params.id));
         setTitle(c.title);
-        setStatus(c.status);
+        setStatus(c.status as any);
         setCreatedBR(formatISOToBR(c.created_at));
       } catch (e: any) {
         setErr(e?.message ?? "Erro ao carregar curso");
@@ -29,7 +30,9 @@ export default function CourseForm() {
   }, [isEdit, params.id]);
 
   const canSubmit = useMemo(() => {
-    return title.trim().length >= 3 && (status === "ativo" || status === "inativo");
+    return (
+      title.trim().length >= 3 && (status === "ativo" || status === "inativo")
+    );
   }, [title, status]);
 
   async function handleSubmit(e: React.FormEvent) {
@@ -41,9 +44,12 @@ export default function CourseForm() {
       return;
     }
 
-    const payload: Partial<Course> & { title: string; status: "ativo" | "inativo" } = {
+    const payload: Partial<Course> & {
+      title: string;
+      status: "ativo" | "inativo";
+    } = {
       title: title.trim(),
-      status,
+      status: status as any,
     };
 
     if (createdBR.trim()) {
@@ -60,7 +66,7 @@ export default function CourseForm() {
       if (isEdit) {
         await updateCourse(Number(params.id), payload);
       } else {
-        await createCourse(payload);
+        await createCourse(payload as any);
       }
       navigate("/courses");
     } catch (e: any) {
@@ -72,9 +78,13 @@ export default function CourseForm() {
 
   return (
     <div className="mx-auto max-w-3xl p-6">
-      <h1 className="mb-6 text-2xl font-semibold">{isEdit ? "Editar curso" : "Novo curso"}</h1>
+      <h1 className="mb-6 text-2xl font-semibold">
+        {isEdit ? "Editar curso" : "Novo curso"}
+      </h1>
 
-      {err && <p className="mb-4 rounded-md bg-red-50 p-3 text-red-700">{err}</p>}
+      {err && (
+        <p className="mb-4 rounded-md bg-red-50 p-3 text-red-700">{err}</p>
+      )}
 
       <form className="grid gap-4" onSubmit={handleSubmit}>
         <div className="grid gap-2">
@@ -97,14 +107,16 @@ export default function CourseForm() {
             onChange={(e) => setStatus(e.target.value as any)}
             required
           >
-            <option value="">Selecione...</option>
+            <option value="">Selecione.</option>
             <option value="ativo">Ativo</option>
             <option value="inativo">Inativo</option>
           </select>
         </div>
 
         <div className="grid gap-2">
-          <label className="text-sm font-medium">Criado em (DD/MM/AAAA) — opcional</label>
+          <label className="text-sm font-medium">
+            Criado em (DD/MM/AAAA) — opcional
+          </label>
           <input
             className="rounded-md border p-2"
             placeholder="DD/MM/AAAA"
