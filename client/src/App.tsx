@@ -64,6 +64,19 @@ export default function App() {
           <Route path="*" element={<Navigate to="/courses" replace />} />
         </Routes>
       </Container>
+
+      {/* Rodapé */}
+      <footer className="mt-10 border-t pt-4 pb-6 text-center text-sm text-gray-500">
+        Fonte do logo:{" "}
+        <a
+          href="https://br.freepik.com/vetores-gratis/ilustracao-do-conceito-abstrato-da-plataforma-da-escola-online-ensino-domestico-plataforma-de-educacao-online-aulas-digitais-cursos-virtuais-lms-para-a-escola_12145615.htm#fromView=keyword&page=1&position=0&uuid=ba1cc70d-f72c-4055-83e5-87318c33e749&query=Educacao+svg"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline hover:text-gray-700"
+        >
+          Freepik
+        </a>
+      </footer>
     </BrowserRouter>
   );
 }
