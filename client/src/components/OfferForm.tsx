@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { Course, Offer, createOffer, updateOffer } from "../lib/api";
 import { formatISOToBR, formatBRToISO } from "../lib/dates";
 
@@ -84,13 +84,6 @@ export default function OfferForm({
     return base.sort((a, b) => collator.compare(a.title, b.title));
   }, [courses, initial]);
 
-  useEffect(() => {
-    // se estiver criando e não houver seleção, tente pré-selecionar o primeiro ativo
-    if (!initial && !courseId && selectableCourses.length > 0) {
-      setCourseId(String(selectableCourses[0].id));
-    }
-  }, [initial, courseId, selectableCourses]);
-
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
@@ -126,7 +119,7 @@ export default function OfferForm({
       }
       onSaved();
     } catch (err: any) {
-      // Compatível com Error comum e com nosso fetchJSON (err.status + err.data)
+      // Compatível com Error comum e com fetch JSON que inclui status+data
       let msg = err?.message ?? "Erro ao salvar oferta.";
       const status = err?.status as number | undefined;
       const data = err?.data as any;
