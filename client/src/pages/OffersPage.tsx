@@ -1,5 +1,5 @@
 // client/src/pages/OffersPage.tsx
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import OfferCard from "../components/OfferCard";
 import { listOffers, listCourses, type Offer, type Course } from "../lib/api";
@@ -12,6 +12,9 @@ export default function OffersPage() {
   const [offers, setOffers] = useState<OfferWithCourse[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
+
+  // filtro por título do curso
+  const [q, setQ] = useState("");
 
   useEffect(() => {
     let canceled = false;
@@ -47,6 +50,13 @@ export default function OffersPage() {
       canceled = true;
     };
   }, []);
+
+  const filtered = useMemo(() => {
+    const term = q.trim().toLowerCase();
+    return offers.filter((o) =>
+      !term ? true : o.course?.title?.toLowerCase().includes(term) ?? false
+    );
+  }, [offers, q]);
 
   if (loading) {
     return (
@@ -91,11 +101,21 @@ export default function OffersPage() {
         </button>
       </header>
 
-      {offers.length === 0 ? (
-        <p className="text-zinc-600">Nenhuma oferta cadastrada.</p>
+      {/* filtro por título do curso */}
+      <div className="mb-4">
+        <input
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          placeholder="Buscar por título do curso…"
+          className="input sm:w-80"
+        />
+      </div>
+
+      {filtered.length === 0 ? (
+        <p className="text-zinc-600">Nenhuma oferta encontrada.</p>
       ) : (
         <ul className="grid gap-4 md:grid-cols-2">
-          {offers.map((o) => (
+          {filtered.map((o) => (
             <li key={o.id}>
               <OfferCard offer={o} onEdit={() => nav(`/offers/${o.id}/edit`)} />
             </li>
