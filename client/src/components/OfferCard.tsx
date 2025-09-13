@@ -1,26 +1,51 @@
 // client/src/components/OfferCard.tsx
-import type { OfferFull } from "../lib/api";
-import { formatISOToBR } from "../lib/dates";
+import { useMemo } from "react";
+import { type Offer, type Course } from "../lib/api";
+
+export type OfferFull = Offer & { course?: Course | null };
 
 type Props = {
   offer: OfferFull;
-  onEdit?: (o: OfferFull) => void;
+  onEdit?: (id: number) => void;
   onDelete?: (id: number) => void;
 };
 
 export default function OfferCard({ offer, onEdit, onDelete }: Props) {
-  return (
-    <article className="rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm">
-      <header className="mb-1 flex items-center justify-between">
-        <h3 className="text-lg font-semibold">{offer.course.title}</h3>
-      </header>
-      <p className="text-sm text-zinc-500">
-        {formatISOToBR(offer.period_start)} até {formatISOToBR(offer.period_end)}
-      </p>
+  // Formatação "De ... até ..."
+  const periodText = useMemo(() => {
+    const start = new Date(offer.period_start);
+    const end = new Date(offer.period_end);
+    const opts: Intl.DateTimeFormatOptions = {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    };
+    const startStr = isNaN(start.getTime())
+      ? "-"
+      : start.toLocaleDateString("pt-BR", opts);
+    const endStr = isNaN(end.getTime())
+      ? "-"
+      : end.toLocaleDateString("pt-BR", opts);
+    return `De ${startStr} até ${endStr}`;
+  }, [offer.period_start, offer.period_end]);
 
-      <footer className="mt-3 flex gap-2">
-        <button className="btn btn-sm" onClick={() => onEdit?.(offer)}>Editar</button>
-        <button className="btn btn-sm btn-danger" onClick={() => onDelete?.(offer.id)}>Remover</button>
+  return (
+    <article className="rounded-2xl border border-gray-200 p-4 shadow hover:shadow-md transition">
+      <header className="mb-2">
+        <h3 className="text-lg font-semibold">
+          {offer.course?.title ?? `Curso #${offer.course_id}`}
+        </h3>
+      </header>
+
+      <p className="text-sm text-gray-600">{periodText}</p>
+
+      <footer className="mt-4 flex items-center gap-2">
+        <button className="btn" onClick={() => onEdit?.(offer.id)}>
+          Editar
+        </button>
+        <button className="btn btn-danger" onClick={() => onDelete?.(offer.id)}>
+          Remover
+        </button>
       </footer>
     </article>
   );

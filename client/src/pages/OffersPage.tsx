@@ -5,7 +5,7 @@ import OfferCard from "../components/OfferCard";
 import {
   listOffers,
   listCourses,
-  deleteOffer, // <-- adicionamos
+  deleteOffer,
   type Offer,
   type Course,
 } from "../lib/api";
@@ -30,13 +30,11 @@ export default function OffersPage() {
         setLoading(true);
         setLoadError(null);
 
-        // Busca ofertas e cursos em paralelo
         const [offersRaw, courses] = await Promise.all([
           listOffers(),
           listCourses(),
         ]);
 
-        // Junta cada oferta ao seu curso
         const byId = new Map<number, Course>(courses.map((c) => [c.id, c]));
         const joined: OfferWithCourse[] = offersRaw.map((o) => ({
           ...o,
@@ -111,9 +109,7 @@ export default function OffersPage() {
   return (
     <section className="space-y-4">
       <header className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold">
-          Ofertas{offers.length ? ` (${offers.length})` : ""}
-        </h1>
+        <h1 className="text-xl font-semibold">Ofertas</h1>
         <button className="btn btn-success" onClick={() => nav("/offers/new")}>
           Nova oferta
         </button>
@@ -136,7 +132,7 @@ export default function OffersPage() {
           {filtered.map((o) => (
             <li key={o.id}>
               <OfferCard
-                offer={o as any} // estruturalmente compatível com OfferFull esperado no card
+                offer={o as any}
                 onEdit={() => nav(`/offers/${o.id}/edit`)}
                 onDelete={handleDelete}
               />
