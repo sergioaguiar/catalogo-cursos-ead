@@ -5,10 +5,10 @@ import { fileURLToPath } from "node:url";
 import fs from "node:fs";
 
 const __filename = fileURLToPath(import.meta.url);
-const __dirname  = path.dirname(__filename);
+const __dirname = path.dirname(__filename);
 
 // Arquivo do banco (JSON) ao lado deste .ts
-export const DB_PATH = path.join(__dirname, "db.json");
+export const DB_PATH = path.resolve(__dirname, "../../db.json");
 
 // Tipos do schema
 export type Course = {
@@ -38,7 +38,11 @@ export const db = new Low<DbSchema>(adapter, { courses: [], offers: [] });
 export async function initDb() {
   // Garante que o arquivo exista
   if (!fs.existsSync(DB_PATH)) {
-    fs.writeFileSync(DB_PATH, JSON.stringify({ courses: [], offers: [] }, null, 2), { encoding: "utf8" });
+    fs.writeFileSync(
+      DB_PATH,
+      JSON.stringify({ courses: [], offers: [] }, null, 2),
+      { encoding: "utf8" }
+    );
   }
 
   await db.read();

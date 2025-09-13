@@ -1,4 +1,10 @@
-﻿import { BrowserRouter, Routes, Route, Navigate, useNavigate } from "react-router-dom";
+﻿import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Navigate,
+  useNavigate,
+} from "react-router-dom";
 import { useEffect, useState } from "react";
 
 // Páginas/Componentes
@@ -7,6 +13,7 @@ import OffersPage from "./pages/OffersPage.tsx";
 import CourseForm from "./components/CourseForm.tsx";
 import OfferForm from "./components/OfferForm.tsx";
 import Navbar from "./components/Navbar.tsx";
+import OfferFormPage from "./pages/OfferFormPage";
 
 // API
 import { listCourses, type Course } from "./lib/api";
@@ -18,7 +25,9 @@ function NewOfferPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    listCourses().then(setCourses).finally(() => setLoading(false));
+    listCourses()
+      .then(setCourses)
+      .finally(() => setLoading(false));
   }, []);
 
   if (loading) return <p className="p-4">Carregando cursos...</p>;
@@ -50,6 +59,7 @@ export default function App() {
           <Route path="/courses/:id/edit" element={<CourseForm />} />
           <Route path="/offers" element={<OffersPage />} />
           <Route path="/offers/new" element={<NewOfferPage />} />
+          <Route path="/offers/:id/edit" element={<OfferFormPage />} />
         </Routes>
       </Container>
     </BrowserRouter>

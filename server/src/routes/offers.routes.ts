@@ -32,7 +32,12 @@ function isRangeValid(start: string, end: string) {
   return Number.isFinite(s) && Number.isFinite(e) && s <= e;
 }
 
-function rangesOverlap(aStart: string, aEnd: string, bStart: string, bEnd: string) {
+function rangesOverlap(
+  aStart: string,
+  aEnd: string,
+  bStart: string,
+  bEnd: string
+) {
   const as = Date.parse(aStart);
   const ae = Date.parse(aEnd);
   const bs = Date.parse(bStart);
@@ -42,18 +47,23 @@ function rangesOverlap(aStart: string, aEnd: string, bStart: string, bEnd: strin
   return as <= be && ae >= bs;
 }
 
-/** Verifica se o período informado colide com alguma outra oferta do mesmo curso. 
+/** Verifica se o período informado colide com alguma outra oferta do mesmo curso.
  *  use ignoreId para PATCH (ignorar a própria oferta).
  */
-function hasOverlapForCourse(course_id: number, start: string, end: string, ignoreId?: number) {
+function hasOverlapForCourse(
+  course_id: number,
+  start: string,
+  end: string,
+  ignoreId?: number
+) {
   const { offers } = db.data!;
-  return offers.some(o =>
-    o.course_id === course_id &&
-    (ignoreId ? o.id !== ignoreId : true) &&
-    rangesOverlap(start, end, o.period_start, o.period_end)
+  return offers.some(
+    (o) =>
+      o.course_id === course_id &&
+      (ignoreId ? o.id !== ignoreId : true) &&
+      rangesOverlap(start, end, o.period_start, o.period_end)
   );
 }
-
 
 function applyFilters(
   list: Offer[],
@@ -65,13 +75,13 @@ function applyFilters(
   let out = list;
 
   if (Number.isFinite(course_id)) {
-    out = out.filter(o => o.course_id === course_id);
+    out = out.filter((o) => o.course_id === course_id);
   }
 
   const fromDt = parseDateISO(from);
   const toDt = parseDateISO(to);
   if (fromDt || toDt) {
-    out = out.filter(o => {
+    out = out.filter((o) => {
       const c = Date.parse(o.created_at);
       if (fromDt && c < +fromDt) return false;
       if (toDt && c > +toDt) return false;
@@ -82,7 +92,7 @@ function applyFilters(
   // activeOn = “pegar ofertas ativas na data”
   const on = parseDateISO(activeOn);
   if (on) {
-    out = out.filter(o => {
+    out = out.filter((o) => {
       const start = Date.parse(o.period_start);
       const end = Date.parse(o.period_end);
       const x = +on;
@@ -167,9 +177,9 @@ router.get("/full", (req, res) => {
   );
   const sorted = sortOffers(filtered, sort, order);
 
-  const enriched = sorted.map(o => ({
+  const enriched = sorted.map((o) => ({
     ...o,
-    course: data.courses.find(c => c.id === o.course_id) ?? null,
+    course: data.courses.find((c) => c.id === o.course_id) ?? null,
   }));
 
   const result = maybePaginate(req.query, enriched);
@@ -179,7 +189,7 @@ router.get("/full", (req, res) => {
 // GET /offers/:id
 router.get("/:id", (req, res) => {
   const id = Number(req.params.id);
-  const o = db.data!.offers.find(x => x.id === id);
+  const o = db.data!.offers.find((x) => x.id === id);
   if (!o) return res.status(404).json({ error: "Not found" });
   res.json(o);
 });
@@ -188,9 +198,9 @@ router.get("/:id", (req, res) => {
 router.get("/:id/full", (req, res) => {
   const id = Number(req.params.id);
   const data = db.data!;
-  const o = data.offers.find(x => x.id === id);
+  const o = data.offers.find((x) => x.id === id);
   if (!o) return res.status(404).json({ error: "Not found" });
-  const course = data.courses.find(c => c.id === o.course_id) ?? null;
+  const course = data.courses.find((c) => c.id === o.course_id) ?? null;
   res.json({ ...o, course });
 });
 
@@ -202,10 +212,13 @@ router.post("/", (req, res) => {
   if (!Number.isFinite(course_id)) {
     return res
       .status(400)
-      .json({ error: "Validação falhou", details: { course_id: "obrigatório (number)" } });
+      .json({
+        error: "Validação falhou",
+        details: { course_id: "obrigatório (number)" },
+      });
   }
   const data = db.data!;
-  const course = data.courses.find(c => c.id === Number(course_id));
+  const course = data.courses.find((c) => c.id === Number(course_id));
   if (!course) {
     return res.status(400).json({ error: "course_id inexistente" });
   }
@@ -218,13 +231,23 @@ router.post("/", (req, res) => {
   if (!isRangeValid(String(period_start), String(period_end))) {
     return res.status(400).json({
       error: "Validação falhou",
-      details: { period: "period_start deve ser <= period_end e ambas datas válidas" },
+      details: {
+        period: "period_start deve ser <= period_end e ambas datas válidas",
+      },
     });
   }
-  if (hasOverlapForCourse(Number(course_id), String(period_start), String(period_end))) {
+  if (
+    hasOverlapForCourse(
+      Number(course_id),
+      String(period_start),
+      String(period_end)
+    )
+  ) {
     return res.status(409).json({
       error: "Conflito",
-      details: { overlap: "Já existe oferta deste curso com período sobreposto" },
+      details: {
+        overlap: "Já existe oferta deste curso com período sobreposto",
+      },
     });
   }
 
@@ -241,18 +264,17 @@ router.post("/", (req, res) => {
   res.status(201).json(offer);
 });
 
-
 // PATCH /offers/:id
 router.patch("/:id", (req, res) => {
   const id = Number(req.params.id);
-  const o = db.data!.offers.find(x => x.id === id);
+  const o = db.data!.offers.find((x) => x.id === id);
   if (!o) return res.status(404).json({ error: "Not found" });
 
   const incoming = req.body as Partial<Offer>;
 
   // Se trocar course_id, verifique se existe
   if (incoming.course_id !== undefined) {
-    const c = db.data!.courses.find(c => c.id === Number(incoming.course_id));
+    const c = db.data!.courses.find((c) => c.id === Number(incoming.course_id));
     if (!c) {
       return res.status(400).json({ error: "course_id inexistente" });
     }
@@ -260,25 +282,43 @@ router.patch("/:id", (req, res) => {
 
   // Compute novos valores candidatos
   const next = {
-    course_id: incoming.course_id !== undefined ? Number(incoming.course_id) : o.course_id,
-    period_start: incoming.period_start !== undefined ? String(incoming.period_start) : o.period_start,
-    period_end: incoming.period_end !== undefined ? String(incoming.period_end) : o.period_end,
-    created_at: incoming.created_at !== undefined ? String(incoming.created_at) : o.created_at,
+    course_id:
+      incoming.course_id !== undefined
+        ? Number(incoming.course_id)
+        : o.course_id,
+    period_start:
+      incoming.period_start !== undefined
+        ? String(incoming.period_start)
+        : o.period_start,
+    period_end:
+      incoming.period_end !== undefined
+        ? String(incoming.period_end)
+        : o.period_end,
+    created_at:
+      incoming.created_at !== undefined
+        ? String(incoming.created_at)
+        : o.created_at,
   };
 
   // Validar período
   if (!isRangeValid(next.period_start, next.period_end)) {
     return res.status(400).json({
       error: "Validação falhou",
-      details: { period: "period_start deve ser <= period_end e ambas datas válidas" },
+      details: {
+        period: "period_start deve ser <= period_end e ambas datas válidas",
+      },
     });
   }
 
   // Colisão com outras ofertas do mesmo curso
-  if (hasOverlapForCourse(next.course_id, next.period_start, next.period_end, id)) {
+  if (
+    hasOverlapForCourse(next.course_id, next.period_start, next.period_end, id)
+  ) {
     return res.status(409).json({
       error: "Conflito",
-      details: { overlap: "Já existe oferta deste curso com período sobreposto" },
+      details: {
+        overlap: "Já existe oferta deste curso com período sobreposto",
+      },
     });
   }
 
@@ -292,12 +332,11 @@ router.patch("/:id", (req, res) => {
   res.json(o);
 });
 
-
 // DELETE /offers/:id
 router.delete("/:id", (req, res) => {
   const id = Number(req.params.id);
   const data = db.data!;
-  const idx = data.offers.findIndex(x => x.id === id);
+  const idx = data.offers.findIndex((x) => x.id === id);
   if (idx === -1) return res.status(404).json({ error: "Not found" });
   data.offers.splice(idx, 1);
   db.write();

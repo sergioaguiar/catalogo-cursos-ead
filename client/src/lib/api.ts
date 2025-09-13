@@ -38,7 +38,7 @@ async function fetchJSON<T>(path: string, init?: RequestInit): Promise<T> {
   if (!res.ok) {
     let data: any = null;
     try {
-      data = await res.json(); // tenta ler JSON de erro da API
+      data = await res.json(); // tenta corpo JSON de erro
     } catch {
       try {
         const txt = await res.text();
@@ -53,8 +53,8 @@ async function fetchJSON<T>(path: string, init?: RequestInit): Promise<T> {
       `HTTP ${res.status} ${res.statusText}`;
 
     const err: any = new Error(msg);
-    err.status = res.status; // aditivo e retrocompatível
-    err.data = data; // aditivo e retrocompatível
+    err.status = res.status; // <- importante para OfferForm mapear 400/409
+    err.data = data; // <- carrega { error, details, ... } do backend
     throw err;
   }
 
