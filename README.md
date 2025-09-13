@@ -75,15 +75,17 @@ App disponível em: [http://localhost:5173](http://localhost:5173)
 
 ## 🏷️ Versões estáveis
 
-- **v0.4.0-estavel** – Versão atual. Inclui:
+- **v1.0.0** – Primeira versão 1.x estável.  
+  Inclui:
 
-  - Filtro por título na lista de ofertas
-  - Validação para impedir criação/edição de cursos duplicados
-  - Logo adicionado no Navbar
-  - Rodapé com crédito à fonte do logo (Freepik)
   - Banco fixo (`server/db.json`) versionado
+  - CRUD completo de cursos e ofertas
+  - Relatórios no backend
+  - Frontend integrado com filtros e validações
 
-- **v0.3.1-estavel** – Validações de datas no backend e frontend, edição de ofertas com formulário pré-preenchido, tratamento de erros da API com mensagens amigáveis
+- **v0.4.0-estavel** – Filtro por título na lista de ofertas, validação contra duplicados, logo no Navbar, rodapé com crédito
+
+- **v0.3.1-estavel** – Validações de datas, edição de ofertas, tratamento de erros
 
 - **v0.2.1-estavel** – Primeira versão estável com seed e `db.example.json` vazio
 
