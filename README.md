@@ -81,6 +81,19 @@ App disponível em: [http://localhost:5173](http://localhost:5173)
 
 ---
 
+---
+
+## 🏷️ Versões estáveis
+
+- **v0.3.1-estavel** – Versão atual. Inclui:
+
+  - Validações de datas (início/fim) no backend e frontend
+  - Edição de ofertas com formulário pré-preenchido
+  - Tratamento de erros da API (400/409) com mensagens amigáveis
+  - Ajustes em rotas e integração cliente-servidor
+
+- **v0.2.1-estavel** – Primeira versão estável com seed e `db.example.json` vazio
+
 ## 🔜 Próximos incrementos
 
 - [ ] Melhorar design responsivo (mobile-first)
