@@ -85,6 +85,13 @@ App disponível em: [http://localhost:5173](http://localhost:5173)
 
 ## 🏷️ Versões estáveis
 
+- **v0.4.0-estavel** – Versão atual. Inclui:
+
+  - Filtro por título na lista de ofertas
+  - Validação para impedir criação/edição de cursos duplicados
+  - Logo adicionado no Navbar
+  - Rodapé com crédito à fonte do logo (Freepik)
+
 - **v0.3.1-estavel** – Versão atual. Inclui:
 
   - Validações de datas (início/fim) no backend e frontend
