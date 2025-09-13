@@ -21,6 +21,22 @@ npm run dev
 
 API disponível em: [http://localhost:3000](http://localhost:3000)
 
+## 🗄️ Banco de Dados (LowDB)
+
+O banco de dados é armazenado em um arquivo JSON local (`server/db.json`).  
+Esse arquivo **não é versionado** no repositório para evitar conflitos.
+
+Para referência, existe um arquivo `server/db.example.json` vazio.
+
+### Populando dados de exemplo
+
+O repositório inclui um script PowerShell que envia dados iniciais para a API:
+
+````bash
+cd server
+# com o backend rodando em http://localhost:3000
+.\seed.ps1
+
 ---
 
 ## 💻 Frontend (React + Vite + TypeScript + TailwindCSS)
@@ -39,7 +55,7 @@ API disponível em: [http://localhost:3000](http://localhost:3000)
 cd client
 npm install
 npm run dev
-```
+````
 
 App disponível em: [http://localhost:5173](http://localhost:5173)
 
