@@ -2,7 +2,13 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import OfferCard from "../components/OfferCard";
-import { listOffers, listCourses, type Offer, type Course } from "../lib/api";
+import {
+  listOffers,
+  listCourses,
+  deleteOffer, // <-- adicionamos
+  type Offer,
+  type Course,
+} from "../lib/api";
 
 type OfferWithCourse = Offer & { course?: Course | null };
 
@@ -58,6 +64,16 @@ export default function OffersPage() {
     );
   }, [offers, q]);
 
+  async function handleDelete(id: number) {
+    if (!confirm("Remover esta oferta?")) return;
+    try {
+      await deleteOffer(id);
+      setOffers((curr) => curr.filter((o) => o.id !== id));
+    } catch (e: any) {
+      alert(e?.message ?? "Erro ao remover oferta");
+    }
+  }
+
   if (loading) {
     return (
       <section className="space-y-4">
@@ -95,7 +111,9 @@ export default function OffersPage() {
   return (
     <section className="space-y-4">
       <header className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold">Ofertas</h1>
+        <h1 className="text-xl font-semibold">
+          Ofertas{offers.length ? ` (${offers.length})` : ""}
+        </h1>
         <button className="btn btn-success" onClick={() => nav("/offers/new")}>
           Nova oferta
         </button>
@@ -117,7 +135,11 @@ export default function OffersPage() {
         <ul className="grid gap-4 md:grid-cols-2">
           {filtered.map((o) => (
             <li key={o.id}>
-              <OfferCard offer={o} onEdit={() => nav(`/offers/${o.id}/edit`)} />
+              <OfferCard
+                offer={o as any} // estruturalmente compatível com OfferFull esperado no card
+                onEdit={() => nav(`/offers/${o.id}/edit`)}
+                onDelete={handleDelete}
+              />
             </li>
           ))}
         </ul>
