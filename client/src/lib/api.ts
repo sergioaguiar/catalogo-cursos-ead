@@ -6,16 +6,16 @@
 export type Course = {
   id: number;
   title: string;
-  status: string;      // "ativo"/"inativo" (ou "active"/"inactive")
-  created_at: string;  // ISO
+  status: string; // "ativo"/"inativo" (ou "active"/"inactive")
+  created_at: string; // ISO
 };
 
 export type Offer = {
   id: number;
   course_id: number;
   period_start: string; // ISO "YYYY-MM-DD"
-  period_end: string;   // ISO "YYYY-MM-DD"
-  created_at: string;   // ISO datetime
+  period_end: string; // ISO "YYYY-MM-DD"
+  created_at: string; // ISO datetime
 };
 
 export type OfferFull = Offer & {
@@ -34,10 +34,31 @@ async function fetchJSON<T>(path: string, init?: RequestInit): Promise<T> {
     ...init,
     headers: { "Content-Type": "application/json", ...(init?.headers || {}) },
   });
+
   if (!res.ok) {
-    const txt = await res.text().catch(() => "");
-    throw new Error(`Erro ${res.status} em ${path}${txt ? `: ${txt}` : ""}`);
+    let data: any = null;
+    try {
+      data = await res.json(); // tenta ler JSON de erro da API
+    } catch {
+      try {
+        const txt = await res.text();
+        data = txt ? { message: txt } : null;
+      } catch {
+        data = null;
+      }
+    }
+
+    const msg =
+      (data && (data.message || data.error)) ||
+      `HTTP ${res.status} ${res.statusText}`;
+
+    const err: any = new Error(msg);
+    err.status = res.status; // aditivo e retrocompatível
+    err.data = data; // aditivo e retrocompatível
+    throw err;
   }
+
+  if (res.status === 204) return null as T; // no content
   return res.json();
 }
 
@@ -59,7 +80,10 @@ export function createCourse(data: Omit<Course, "id">): Promise<Course> {
   });
 }
 
-export function updateCourse(id: number, data: Partial<Omit<Course, "id">>): Promise<Course> {
+export function updateCourse(
+  id: number,
+  data: Partial<Omit<Course, "id">>
+): Promise<Course> {
   return fetchJSON<Course>(`/courses/${id}`, {
     method: "PATCH",
     body: JSON.stringify(data),
@@ -107,9 +131,14 @@ export function deleteOffer(id: number): Promise<void> {
  */
 export async function listOffersFull(): Promise<OfferFull[]> {
   const [offers, courses] = await Promise.all([listOffers(), listCourses()]);
-  const byId = new Map<number, Course>(courses.map(c => [c.id, c]));
-  return offers.map(o => ({
+  const byId = new Map<number, Course>(courses.map((c) => [c.id, c]));
+  return offers.map((o) => ({
     ...o,
-    course: byId.get(o.course_id) ?? { id: o.course_id, title: `Curso #${o.course_id}`, status: "ativo", created_at: new Date().toISOString() },
+    course: byId.get(o.course_id) ?? {
+      id: o.course_id,
+      title: `Curso #${o.course_id}`,
+      status: "ativo",
+      created_at: new Date().toISOString(),
+    },
   }));
 }
