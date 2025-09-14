@@ -13,7 +13,7 @@ export default function Navbar() {
             className="mr-3 h-20 w-20 rounded-full object-cover ring-2 ring-slate-700"
           />
           <span className="self-center text-2xl font-semibold tracking-tight text-white">
-            Catálogo EAD
+            Catálogo de Cursos EAD
           </span>
         </Link>
 
