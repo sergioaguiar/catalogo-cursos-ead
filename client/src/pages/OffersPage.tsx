@@ -76,7 +76,7 @@ export default function OffersPage() {
     return (
       <section className="space-y-4">
         <header className="flex items-center justify-between">
-          <h1 className="text-xl font-semibold">Ofertas</h1>
+          <h1 className="text-2xl font-bold">Ofertas</h1>
           <button
             className="btn btn-success"
             onClick={() => nav("/offers/new")}

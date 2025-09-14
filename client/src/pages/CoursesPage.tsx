@@ -57,9 +57,6 @@ export default function CoursesPage() {
       <header className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold">Cursos</h1>
-          <p className="text-sm text-zinc-600">
-            Listagem carregada de <code>/courses</code>.
-          </p>
         </div>
         <Link to="/courses/new" className="btn btn-success">
           Novo curso
