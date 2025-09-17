@@ -1,346 +1,188 @@
 import { Router } from "express";
-import { db, Offer } from "../db/connection.ts";
+import path from "path";
+import { fileURLToPath } from "url";
+import { Low } from "lowdb";
+import { JSONFile } from "lowdb/node";
 
 const router = Router();
 
-/* --------- helpers --------- */
-function asNumber(v: any, def: number) {
-  const n = Number(v);
-  return Number.isFinite(n) ? n : def;
+/** Tipos */
+type Course = {
+  id: number;
+  title: string;
+  status: string;        // "ativo" | "inativo" | ...
+  created_at: string;    // "YYYY-MM-DD"
+};
+
+type Offer = {
+  id: number;
+  course_id: number;
+  period_start: string;  // "YYYY-MM-DD"
+  period_end: string;    // "YYYY-MM-DD"
+  created_at: string;    // "YYYY-MM-DD"
+};
+
+type DB = {
+  courses: Course[];
+  offers: Offer[];
+};
+
+/** LowDB (forma estável e simples) */
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const dbFile = path.resolve(__dirname, "..", "..", "db.json");
+const adapter = new JSONFile<DB>(dbFile);
+const db = new Low<DB>(adapter, { courses: [], offers: [] });
+
+await db.read();
+db.data ||= { courses: [], offers: [] };
+
+/** Helpers */
+function isYYYYMMDD(s: unknown): s is string {
+  return typeof s === "string" && /^\d{4}-\d{2}-\d{2}$/.test(s);
+}
+function todayYYYYMMDD(): string {
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+function datesRangeIsValid(startISO: string, endISO: string) {
+  // strings YYYY-MM-DD são ordenáveis lexicograficamente
+  return endISO >= startISO;
+}
+function rangesOverlap(aStart: string, aEnd: string, bStart: string, bEnd: string) {
+  return !(aEnd < bStart || bEnd < aStart);
+}
+function isActive(c?: Course) {
+  const st = String(c?.status ?? "").trim().toLowerCase();
+  return st === "ativo" || st === "active";
+}
+function nextId(): number {
+  const arr = db.data!.offers;
+  return arr.length ? Math.max(...arr.map((o) => o.id)) + 1 : 1;
 }
 
-function parseDateISO(d?: string) {
-  if (!d) return undefined;
-  const t = Date.parse(d);
-  return Number.isFinite(t) ? new Date(t) : undefined;
-}
-
-function sortOffers(list: Offer[], sort: string, order: "asc" | "desc") {
-  const dir = order === "desc" ? -1 : 1;
-  return [...list].sort((a, b) => {
-    if (sort === "created_at") {
-      return (Date.parse(a.created_at) - Date.parse(b.created_at)) * dir;
-    }
-    // default: period_start
-    return (Date.parse(a.period_start) - Date.parse(b.period_start)) * dir;
-  });
-}
-
-function isRangeValid(start: string, end: string) {
-  const s = Date.parse(start);
-  const e = Date.parse(end);
-  return Number.isFinite(s) && Number.isFinite(e) && s <= e;
-}
-
-function rangesOverlap(
-  aStart: string,
-  aEnd: string,
-  bStart: string,
-  bEnd: string
-) {
-  const as = Date.parse(aStart);
-  const ae = Date.parse(aEnd);
-  const bs = Date.parse(bStart);
-  const be = Date.parse(bEnd);
-  if (![as, ae, bs, be].every(Number.isFinite)) return false;
-  // Sobrepõe se um começa antes do outro terminar e termina depois do outro começar
-  return as <= be && ae >= bs;
-}
-
-/** Verifica se o período informado colide com alguma outra oferta do mesmo curso.
- *  use ignoreId para PATCH (ignorar a própria oferta).
- */
-function hasOverlapForCourse(
-  course_id: number,
-  start: string,
-  end: string,
-  ignoreId?: number
-) {
-  const { offers } = db.data!;
-  return offers.some(
-    (o) =>
-      o.course_id === course_id &&
-      (ignoreId ? o.id !== ignoreId : true) &&
-      rangesOverlap(start, end, o.period_start, o.period_end)
+/** Rotas */
+router.get("/", async (_req, res) => {
+  // DESC: mais recentes primeiro
+  const ordered = [...db.data!.offers].sort((a, b) =>
+    b.period_start.localeCompare(a.period_start)
   );
-}
-
-function applyFilters(
-  list: Offer[],
-  course_id?: number,
-  from?: string,
-  to?: string,
-  activeOn?: string
-) {
-  let out = list;
-
-  if (Number.isFinite(course_id)) {
-    out = out.filter((o) => o.course_id === course_id);
-  }
-
-  const fromDt = parseDateISO(from);
-  const toDt = parseDateISO(to);
-  if (fromDt || toDt) {
-    out = out.filter((o) => {
-      const c = Date.parse(o.created_at);
-      if (fromDt && c < +fromDt) return false;
-      if (toDt && c > +toDt) return false;
-      return true;
-    });
-  }
-
-  // activeOn = “pegar ofertas ativas na data”
-  const on = parseDateISO(activeOn);
-  if (on) {
-    out = out.filter((o) => {
-      const start = Date.parse(o.period_start);
-      const end = Date.parse(o.period_end);
-      const x = +on;
-      return x >= start && x <= end;
-    });
-  }
-
-  return out;
-}
-
-function maybePaginate<T>(reqQuery: any, items: T[]) {
-  const hasPagination =
-    reqQuery.page !== undefined || reqQuery.pageSize !== undefined;
-
-  if (!hasPagination) return items; // compat: mantém array simples
-
-  const page = Math.max(1, asNumber(reqQuery.page, 1));
-  const pageSize = Math.min(100, Math.max(1, asNumber(reqQuery.pageSize, 10)));
-  const total = items.length;
-  const totalPages = Math.max(1, Math.ceil(total / pageSize));
-  const start = (page - 1) * pageSize;
-  const data = items.slice(start, start + pageSize);
-
-  return {
-    data,
-    meta: { page, pageSize, total, totalPages },
-  };
-}
-
-/* ---------- LISTAGENS ---------- */
-
-// GET /offers (filtros/ordenação/paginação)
-// Query params:
-// - course_id (number)
-// - from, to (ISO date) -> faixa em created_at
-// - activeOn (YYYY-MM-DD) -> ofertas ativas nesse dia (period_start <= dia <= period_end)
-// - sort: created_at | period_start (default: period_start)
-// - order: asc | desc (default: asc)
-// - page, pageSize (se informar, resposta vira { data, meta })
-router.get("/", (req, res) => {
-  const course_id = asNumber(req.query.course_id, NaN);
-  const from = req.query.from as string | undefined;
-  const to = req.query.to as string | undefined;
-  const activeOn = req.query.activeOn as string | undefined;
-  const sort = (req.query.sort as string) || "period_start";
-  const order = ((req.query.order as string) || "asc").toLowerCase() as
-    | "asc"
-    | "desc";
-
-  const data = db.data!;
-  const filtered = applyFilters(
-    data.offers,
-    Number.isFinite(course_id) ? course_id : undefined,
-    from,
-    to,
-    activeOn
-  );
-  const sorted = sortOffers(filtered, sort, order);
-
-  const result = maybePaginate(req.query, sorted);
-  res.json(result);
+  res.json(ordered);
 });
 
-// GET /offers/full -> oferta + course (join simplificado)
-router.get("/full", (req, res) => {
-  const course_id = asNumber(req.query.course_id, NaN);
-  const from = req.query.from as string | undefined;
-  const to = req.query.to as string | undefined;
-  const activeOn = req.query.activeOn as string | undefined;
-  const sort = (req.query.sort as string) || "period_start";
-  const order = ((req.query.order as string) || "asc").toLowerCase() as
-    | "asc"
-    | "desc";
-
-  const data = db.data!;
-  const filtered = applyFilters(
-    data.offers,
-    Number.isFinite(course_id) ? course_id : undefined,
-    from,
-    to,
-    activeOn
-  );
-  const sorted = sortOffers(filtered, sort, order);
-
-  const enriched = sorted.map((o) => ({
-    ...o,
-    course: data.courses.find((c) => c.id === o.course_id) ?? null,
-  }));
-
-  const result = maybePaginate(req.query, enriched);
-  res.json(result);
-});
-
-// GET /offers/:id
-router.get("/:id", (req, res) => {
+router.get("/:id", async (req, res) => {
   const id = Number(req.params.id);
   const o = db.data!.offers.find((x) => x.id === id);
-  if (!o) return res.status(404).json({ error: "Not found" });
+  if (!o) return res.status(404).json({ error: "Oferta não encontrada." });
   res.json(o);
 });
 
-// GET /offers/:id/full
-router.get("/:id/full", (req, res) => {
-  const id = Number(req.params.id);
-  const data = db.data!;
-  const o = data.offers.find((x) => x.id === id);
-  if (!o) return res.status(404).json({ error: "Not found" });
-  const course = data.courses.find((c) => c.id === o.course_id) ?? null;
-  res.json({ ...o, course });
-});
+router.post("/", async (req, res) => {
+  const { course_id, period_start, period_end, created_at } = req.body ?? {};
 
-// POST /offers
-router.post("/", (req, res) => {
-  const { course_id, created_at, period_start, period_end } =
-    req.body as Partial<Offer>;
+  if (!Number.isFinite(Number(course_id))) {
+    return res.status(400).json({ error: "course_id inválido." });
+  }
+  if (!isYYYYMMDD(period_start) || !isYYYYMMDD(period_end)) {
+    return res.status(400).json({
+      error: "Datas devem estar em YYYY-MM-DD.",
+      details: { period_start, period_end },
+    });
+  }
+  if (!datesRangeIsValid(period_start, period_end)) {
+    return res.status(400).json({
+      error: "A data de fim não pode ser anterior à data de início.",
+      details: { period: true },
+    });
+  }
 
-  if (!Number.isFinite(course_id)) {
+  const course = db.data!.courses.find((c) => c.id === Number(course_id));
+  if (!course) return res.status(404).json({ error: "Curso não encontrado." });
+  if (!isActive(course)) {
+    return res.status(400).json({ error: "Somente cursos ativos podem receber ofertas." });
+  }
+
+  const overlap = db
+    .data!.offers.filter((o) => o.course_id === Number(course_id))
+    .some((o) => rangesOverlap(o.period_start, o.period_end, period_start, period_end));
+
+  if (overlap) {
     return res
-      .status(400)
-      .json({
-        error: "Validação falhou",
-        details: { course_id: "obrigatório (number)" },
-      });
-  }
-  const data = db.data!;
-  const course = data.courses.find((c) => c.id === Number(course_id));
-  if (!course) {
-    return res.status(400).json({ error: "course_id inexistente" });
-  }
-  if (!period_start || !period_end) {
-    return res.status(400).json({
-      error: "Validação falhou",
-      details: { period_start: "obrigatório", period_end: "obrigatório" },
-    });
-  }
-  if (!isRangeValid(String(period_start), String(period_end))) {
-    return res.status(400).json({
-      error: "Validação falhou",
-      details: {
-        period: "period_start deve ser <= period_end e ambas datas válidas",
-      },
-    });
-  }
-  if (
-    hasOverlapForCourse(
-      Number(course_id),
-      String(period_start),
-      String(period_end)
-    )
-  ) {
-    return res.status(409).json({
-      error: "Conflito",
-      details: {
-        overlap: "Já existe oferta deste curso com período sobreposto",
-      },
-    });
+      .status(409)
+      .json({ error: "Período sobreposto para este curso.", details: { overlap: true } });
   }
 
-  const id = (data.offers.at(-1)?.id ?? 0) + 1;
   const offer: Offer = {
-    id,
+    id: nextId(),
     course_id: Number(course_id),
-    created_at: created_at ?? new Date().toISOString(),
-    period_start: String(period_start),
-    period_end: String(period_end),
+    // ⚠️ sem new Date / sem toISOString: salvamos as STRINGS puras
+    period_start,
+    period_end,
+    created_at: isYYYYMMDD(created_at) ? created_at : todayYYYYMMDD(),
   };
-  data.offers.push(offer);
-  db.write();
+
+  db.data!.offers.push(offer);
+  await db.write();
   res.status(201).json(offer);
 });
 
-// PATCH /offers/:id
-router.patch("/:id", (req, res) => {
+router.put("/:id", async (req, res) => {
   const id = Number(req.params.id);
-  const o = db.data!.offers.find((x) => x.id === id);
-  if (!o) return res.status(404).json({ error: "Not found" });
+  const existing = db.data!.offers.find((o) => o.id === id);
+  if (!existing) return res.status(404).json({ error: "Oferta não encontrada." });
 
-  const incoming = req.body as Partial<Offer>;
+  const { course_id, period_start, period_end, created_at } = req.body ?? {};
 
-  // Se trocar course_id, verifique se existe
-  if (incoming.course_id !== undefined) {
-    const c = db.data!.courses.find((c) => c.id === Number(incoming.course_id));
-    if (!c) {
-      return res.status(400).json({ error: "course_id inexistente" });
-    }
+  if (!Number.isFinite(Number(course_id))) {
+    return res.status(400).json({ error: "course_id inválido." });
   }
-
-  // Compute novos valores candidatos
-  const next = {
-    course_id:
-      incoming.course_id !== undefined
-        ? Number(incoming.course_id)
-        : o.course_id,
-    period_start:
-      incoming.period_start !== undefined
-        ? String(incoming.period_start)
-        : o.period_start,
-    period_end:
-      incoming.period_end !== undefined
-        ? String(incoming.period_end)
-        : o.period_end,
-    created_at:
-      incoming.created_at !== undefined
-        ? String(incoming.created_at)
-        : o.created_at,
-  };
-
-  // Validar período
-  if (!isRangeValid(next.period_start, next.period_end)) {
+  if (!isYYYYMMDD(period_start) || !isYYYYMMDD(period_end)) {
     return res.status(400).json({
-      error: "Validação falhou",
-      details: {
-        period: "period_start deve ser <= period_end e ambas datas válidas",
-      },
+      error: "Datas devem estar em YYYY-MM-DD.",
+      details: { period_start, period_end },
+    });
+  }
+  if (!datesRangeIsValid(period_start, period_end)) {
+    return res.status(400).json({
+      error: "A data de fim não pode ser anterior à data de início.",
+      details: { period: true },
     });
   }
 
-  // Colisão com outras ofertas do mesmo curso
-  if (
-    hasOverlapForCourse(next.course_id, next.period_start, next.period_end, id)
-  ) {
-    return res.status(409).json({
-      error: "Conflito",
-      details: {
-        overlap: "Já existe oferta deste curso com período sobreposto",
-      },
-    });
+  const course = db.data!.courses.find((c) => c.id === Number(course_id));
+  if (!course) return res.status(404).json({ error: "Curso não encontrado." });
+  if (!isActive(course)) {
+    return res.status(400).json({ error: "Somente cursos ativos podem receber ofertas." });
   }
 
-  // Persistir
-  o.course_id = next.course_id;
-  o.period_start = next.period_start;
-  o.period_end = next.period_end;
-  o.created_at = next.created_at;
+  const overlap = db
+    .data!.offers.filter((o) => o.course_id === Number(course_id) && o.id !== id)
+    .some((o) => rangesOverlap(o.period_start, o.period_end, period_start, period_end));
+  if (overlap) {
+    return res
+      .status(409)
+      .json({ error: "Período sobreposto para este curso.", details: { overlap: true } });
+  }
 
-  db.write();
-  res.json(o);
+  existing.course_id = Number(course_id);
+  existing.period_start = period_start; // manter string pura
+  existing.period_end = period_end;     // manter string pura
+  if (isYYYYMMDD(created_at)) existing.created_at = created_at;
+
+  await db.write();
+  res.json(existing);
 });
 
-// DELETE /offers/:id
-router.delete("/:id", (req, res) => {
+router.delete("/:id", async (req, res) => {
   const id = Number(req.params.id);
-  const data = db.data!;
-  const idx = data.offers.findIndex((x) => x.id === id);
-  if (idx === -1) return res.status(404).json({ error: "Not found" });
-  data.offers.splice(idx, 1);
-  db.write();
-  res.status(204).end();
+  const ix = db.data!.offers.findIndex((o) => o.id === id);
+  if (ix < 0) return res.status(404).json({ error: "Oferta não encontrada." });
+  const [removed] = db.data!.offers.splice(ix, 1);
+  await db.write();
+  res.json(removed);
 });
 
 export default router;
