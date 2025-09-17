@@ -107,7 +107,7 @@ export default function OfferForm({
       course_id: Number(courseId),
       period_start: formatBRToISO(startBR), // yyyy-mm-dd
       period_end: formatBRToISO(endBR),
-      created_at: createdAtBR ? formatBRToISO(createdAtBR) : undefined,
+      created_at: createdAtBR  ? formatBRToISO(createdAtBR)  : new Date().toISOString().slice(0,10),
     };
 
     try {
